@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.info.mapper.CountryFindMapper">
+
+    <resultMap type="CountryFind" id="CountryFindResult">
+        <result property="id" column="id"/>
+        <result property="biologyId" column="biology_id"/>
+        <result property="biologyName" column="biology_name"/>
+        <result property="countryId" column="country_id"/>
+        <result property="countryName" column="country_name"/>
+        <result property="foundTime" column="found_time"/>
+        <result property="foundLocation" column="found_location"/>
+        <result property="longitude" column="longitude"/>
+        <result property="latitude" column="latitude"/>
+    </resultMap>
+
+    <sql id="selectCountryFindVo">
+        select cf.id             as id,
+               cf.biology_id     as biology_id,
+               b.name            as biology_name,
+               cf.country_id     as country_id,
+               c.name            as country_name,
+               cf.found_time     as found_time,
+               cf.found_location as found_location,
+               cf.longitude      as longitude,
+               cf.latitude       as latitude
+        from u_country_find as cf
+                 left join u_country as c on c.id = cf.country_id
+                 left join u_biology as b on b.id = cf.biology_id
+    </sql>
+
+    <select id="selectCountryFindList" parameterType="CountryFind" resultMap="CountryFindResult">
+        <include refid="selectCountryFindVo"/>
+        <where>
+            <if test="biologyId != null ">and cf.biology_id = #{biologyId}</if>
+            <if test="countryId != null ">and cf.country_id = #{countryId}</if>
+            <if test="foundTime != null ">and cf.found_time = #{foundTime}</if>
+            <if test="foundLocation != null  and foundLocation != ''">and cf.found_location = #{foundLocation}</if>
+        </where>
+    </select>
+
+    <select id="selectCountryFindById" parameterType="Long" resultMap="CountryFindResult">
+        <include refid="selectCountryFindVo"/>
+        where cf.id = #{id}
+    </select>
+
+    <insert id="insertCountryFind" parameterType="CountryFind" useGeneratedKeys="true" keyProperty="id">
+        insert into u_country_find
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="biologyId != null">biology_id,</if>
+            <if test="countryId != null">country_id,</if>
+            <if test="foundTime != null">found_time,</if>
+            <if test="foundLocation != null">found_location,</if>
+            <if test="longitude != null">longitude,</if>
+            <if test="latitude != null">latitude,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="biologyId != null">#{biologyId},</if>
+            <if test="countryId != null">#{countryId},</if>
+            <if test="foundTime != null">#{foundTime},</if>
+            <if test="foundLocation != null">#{foundLocation},</if>
+            <if test="longitude != null">#{longitude},</if>
+            <if test="latitude != null">#{latitude},</if>
+        </trim>
+    </insert>
+
+    <update id="updateCountryFind" parameterType="CountryFind">
+        update u_country_find
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="biologyId != null">biology_id = #{biologyId},</if>
+            <if test="countryId != null">country_id = #{countryId},</if>
+            <if test="foundTime != null">found_time = #{foundTime},</if>
+            <if test="foundLocation != null">found_location = #{foundLocation},</if>
+            <if test="longitude != null">longitude = #{longitude},</if>
+            <if test="latitude != null">latitude = #{latitude},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCountryFindById" parameterType="Long">
+        delete
+        from u_country_find
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteCountryFindByIds" parameterType="String">
+        delete from u_country_find where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

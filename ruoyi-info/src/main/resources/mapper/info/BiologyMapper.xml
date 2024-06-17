@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.info.mapper.BiologyMapper">
+
+    <resultMap type="Biology" id="BiologyResult">
+        <result property="id" column="id"/>
+        <result property="num" column="num"/>
+        <result property="name" column="name"/>
+        <result property="men" column="men"/>
+        <result property="harm" column="harm"/>
+        <result property="worldDistribution" column="world_distribution"/>
+        <result property="latin" column="latin"/>
+    </resultMap>
+
+
+    <sql id="selectBiologyVo">
+        select id, num, name, men, harm, world_distribution, latin
+        from u_biology
+    </sql>
+
+
+    <resultMap type="CommonDTO" id="CommonDTOResult">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+    </resultMap>
+
+    <select id="selectBiologyNameList" resultMap="CommonDTOResult">
+        select id, name
+        from u_biology;
+    </select>
+
+    <select id="selectBiologyList" parameterType="Biology" resultMap="BiologyResult">
+        <include refid="selectBiologyVo"/>
+        <where>
+            <if test="num != null ">and num = #{num}</if>
+            <if test="name != null  and name != ''">and name like concat('%', #{name}, '%')</if>
+            <if test="men != null  and men != ''">and men like concat('%', #{men}, '%')</if>
+            <if test="harm != null  and harm != ''">and harm like concat('%', #{harm}, '%')</if>
+            <if test="latin != null  and latin != ''">and latin like concat('%', #{latin}, '%')</if>
+        </where>
+    </select>
+
+    <select id="selectBiologyById" parameterType="Long" resultMap="BiologyResult">
+        <include refid="selectBiologyVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertBiology" parameterType="Biology" useGeneratedKeys="true" keyProperty="id">
+        insert into u_biology
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="num != null">num,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="men != null and men != ''">men,</if>
+            <if test="harm != null and harm != ''">harm,</if>
+            <if test="worldDistribution != null and worldDistribution != ''">world_distribution,</if>
+            <if test="latin != null and latin != ''">latin,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="num != null">#{num},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="men != null and men != ''">#{men},</if>
+            <if test="harm != null and harm != ''">#{harm},</if>
+            <if test="worldDistribution != null and worldDistribution != ''">#{worldDistribution},</if>
+            <if test="latin != null and latin != ''">#{latin},</if>
+        </trim>
+    </insert>
+
+    <update id="updateBiology" parameterType="Biology">
+        update u_biology
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="num != null">num = #{num},</if>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="men != null and men != ''">men = #{men},</if>
+            <if test="harm != null and harm != ''">harm = #{harm},</if>
+            <if test="worldDistribution != null and worldDistribution != ''">world_distribution =
+                #{worldDistribution},
+            </if>
+            <if test="latin != null and latin != ''">latin = #{latin},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteBiologyById" parameterType="Long">
+        delete
+        from u_biology
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteBiologyByIds" parameterType="String">
+        delete from u_biology where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

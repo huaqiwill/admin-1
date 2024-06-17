@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.info.mapper.PortMapper">
+
+    <resultMap type="Port" id="PortResult">
+        <result property="id" column="id"/>
+        <result property="num" column="num"/>
+        <result property="name" column="name"/>
+        <result property="status" column="status"/>
+        <result property="countryId" column="country_id"/>
+        <result property="province" column="province"/>
+    </resultMap>
+
+    <sql id="selectPortVo">
+        select id, num, name, country_id, province, status
+        from u_port
+    </sql>
+
+    <resultMap type="CommonDTO" id="CommonDTOResult">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+    </resultMap>
+
+    <select id="selectPortNameList" resultMap="CommonDTOResult">
+        select id, name
+        from u_port
+        where status = 0;
+    </select>
+
+    <select id="selectPortList" parameterType="Port" resultMap="PortResult">
+        <include refid="selectPortVo"/>
+        <where>
+            <if test="num != null ">and num = #{num}</if>
+            <if test="name != null  and name != ''">and name like concat('%', #{name}, '%')</if>
+            <if test="countryId != null  and countryId != ''">and country_id = #{countryId}</if>
+            <if test="province != null  and province != ''">and province = #{province}</if>
+        </where>
+    </select>
+
+    <select id="selectPortById" parameterType="Long" resultMap="PortResult">
+        <include refid="selectPortVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertPort" parameterType="Port" useGeneratedKeys="true" keyProperty="id">
+        insert into u_port
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="num != null">num,</if>
+            <if test="name != null">name,</if>
+            <if test="status != null">status,</if>
+            <if test="countryId != null">country_id,</if>
+            <if test="province != null">province,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="num != null">#{num},</if>
+            <if test="name != null">#{name},</if>
+            <if test="status != null">#{status},</if>
+            <if test="countryId != null">#{countryId},</if>
+            <if test="province != null">#{province},</if>
+        </trim>
+    </insert>
+
+    <update id="updatePort" parameterType="Port">
+        update u_port
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="num != null">num = #{num},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="countryId != null">country_id = #{countryId},</if>
+            <if test="province != null">province = #{province},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deletePortById" parameterType="Long">
+        delete
+        from u_port
+        where id = #{id}
+    </delete>
+
+    <delete id="deletePortByIds" parameterType="String">
+        delete from u_port where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

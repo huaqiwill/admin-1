@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.info.mapper.PortFindMapper">
+
+    <resultMap type="PortFind" id="PortFindResult">
+        <result property="id" column="id"/>
+        <result property="biologyId" column="biology_id"/>
+        <result property="biologyName" column="biology_name"/>
+        <result property="portId" column="port_id"/>
+        <result property="portName" column="port_name"/>
+        <result property="firstFoundTime" column="first_found_time"/>
+        <result property="firstFoundLocation" column="first_found_location"/>
+    </resultMap>
+
+    <sql id="selectPortFindVo">
+        select pf.id                   as id,
+               pf.biology_id           as biology_id,
+               b.name                  as biology_name,
+               pf.port_id              as port_id,
+               p.name                  as port_name,
+               pf.first_found_time     as first_found_time,
+               pf.first_found_location as first_found_location
+        from u_port_find as pf
+                 left join u_biology as b on b.id = pf.biology_id
+                 left join u_port as p on p.id = pf.port_id
+    </sql>
+
+    <select id="selectPortFindList" parameterType="PortFind" resultMap="PortFindResult">
+        <include refid="selectPortFindVo"/>
+        <where>
+            <if test="biologyId != null  and biologyId != ''">and pf.biology_id = #{biologyId}</if>
+            <if test="portId != null  and portId != ''">and pf.port_id = #{portId}</if>
+            <if test="firstFoundTime != null ">and pf.first_found_time = #{firstFoundTime}</if>
+            <if test="firstFoundLocation != null  and firstFoundLocation != ''">and pf.first_found_location =
+                #{firstFoundLocation}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectPortFindById" parameterType="Long" resultMap="PortFindResult">
+        <include refid="selectPortFindVo"/>
+        where pf.id = #{id}
+    </select>
+
+    <insert id="insertPortFind" parameterType="PortFind" useGeneratedKeys="true" keyProperty="id">
+        insert into u_port_find
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="biologyId != null">biology_id,</if>
+            <if test="portId != null">port_id,</if>
+            <if test="firstFoundTime != null">first_found_time,</if>
+            <if test="firstFoundLocation != null">first_found_location,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="biologyId != null">#{biologyId},</if>
+            <if test="portId != null">#{portId},</if>
+            <if test="firstFoundTime != null">#{firstFoundTime},</if>
+            <if test="firstFoundLocation != null">#{firstFoundLocation},</if>
+        </trim>
+    </insert>
+
+    <update id="updatePortFind" parameterType="PortFind">
+        update u_port_find
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="biologyId != null">biology_id = #{biologyId},</if>
+            <if test="portId != null">port_id = #{portId},</if>
+            <if test="firstFoundTime != null">first_found_time = #{firstFoundTime},</if>
+            <if test="firstFoundLocation != null">first_found_location = #{firstFoundLocation},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deletePortFindById" parameterType="Long">
+        delete
+        from u_port_find
+        where id = #{id}
+    </delete>
+
+    <delete id="deletePortFindByIds" parameterType="String">
+        delete from u_port_find where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
